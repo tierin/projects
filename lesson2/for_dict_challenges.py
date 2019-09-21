@@ -12,10 +12,10 @@ students = [
 def students_count(students):
     count_names = {}
     for elem in students:
-        if count_names.get(elem['first_name']) is None:
-            count_names[elem['first_name']] = 1
-        else:
+        if count_names.get(elem['first_name']):
             count_names[elem['first_name']] += 1
+        else:
+            count_names[elem['first_name']] = 1
     return count_names
 
 
