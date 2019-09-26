@@ -2,16 +2,23 @@ import csv
 import json
 import math
 
-with open('data-397-2019-08-27.json', 'r') as stations, open('data-398-2019-09-18.csv') as stops:
-    fields = stops.readline().replace('"', '').split(';')
-    stations_data = json.load(stations)
-    stops_reader = csv.DictReader(stops, fieldnames=fields, delimiter=';')
+import logging
 
+logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO,
+                    filename='stops.log'
+                    )
+
+with open('data-398-2019-09-18.csv') as stops, open('data-397-2019-08-27.json', 'r') as stations:
+
+    fields = stops.readline().replace('"', '').split(';')[:-1]
+    stops_reader = csv.DictReader(stops, fieldnames=fields, delimiter=';')
     all_stops_coords = {}
     for row in stops_reader:
-        stops_coords = {'longitude': row['Longitude_WGS84'], 'latitude': row['Latitude_WGS84']}
-        all_stops_coords[row['StationName']] = stops_coords
+        stop_coords = {'longitude': row['Longitude_WGS84'], 'latitude': row['Latitude_WGS84']}
+        all_stops_coords[row['Name']] = stop_coords
 
+    stations_data = json.load(stations)
     all_stations_coords = {}
     for station in stations_data:
         station_coords = {'longitude': station['Longitude_WGS84'], 'latitude': station['Latitude_WGS84']}
@@ -35,7 +42,8 @@ for station in all_stations_coords:
             if distance <= 0.5:
                 num += 1
         except ValueError:
-            pass
+            # Это потому что данные кривые или почему?
+            logging.info(station)
     stations_with_stops[station] = num
 
 max_stops = 0
@@ -47,3 +55,4 @@ for station in stations_with_stops:
 
 print(max_stops_station)
 
+print(stations_with_stops)
